@@ -31,8 +31,10 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
       `,
         }
     }).then((result) => {
-        console.log(result.data)
+        console.log('Its a result: ',result.data)
         return result.data.data.ethereum.dexTrades
+    }).catch((error) => {
+        console.log('Its an error: ', error)
     })
 }
 export const getPairs = async () => {

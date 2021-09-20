@@ -12,6 +12,49 @@ import { actionsPairs } from "./redux/pairs-reducer";
 import SearchOutlined from "@ant-design/icons/lib/icons/SearchOutlined";
 import { CloseSquareOutlined } from "@ant-design/icons";
 
+const SearchInputContainer = styled.div`
+  position: relative;
+  width: 500px;
+
+  @media (max-width: 500px) {
+    width: 95vw;
+  }
+`
+const SearchInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`
+const SearchContainer = styled.div`
+  width: 500px;
+  height: 400px;
+  overflow-y: scroll;
+  padding: 10px;
+  border: 1px #989392 solid;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: #EEEAE7;
+  borderRadius: 0 0 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 0px 0 10px 10px;
+  justify-сontent: ${(filteredPairs) => filteredPairs?.length !== 0 ? "unset" : "center"};
+
+  @media (max-width: 500px) {
+    width: 95vw;
+  }
+`
+const SearchItem = styled.div`
+  width: 100%;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+`
+
 const App = ({ pairs, initPairs, isInitialized, addPair }) => {
   const location = useLocation();
   const [viewSearchModal, setViewSearchModal] = useState(false);
@@ -113,49 +156,6 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       }
     }
   }, [searchQuery]);
-
-  const SearchInputContainer = styled.div`
-    position: relative;
-    width: 500px;
-
-    @media (max-width: 500px) {
-      width: 95vw;
-    }
-  `
-  const SearchInput = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  `
-  const SearchContainer = styled.div`
-    width: 500px;
-    height: 400px;
-    overflow-y: scroll;
-    padding: 10px;
-    border: 1px #989392 solid;
-    position: absolute;
-    left: 0;
-    top: 100%;
-    background: #EEEAE7;
-    borderRadius: 0 0 10px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 0px 0 10px 10px;
-    justify-сontent: ${filteredPairs?.length !== 0 ? "unset" : "center"};
-
-    @media (max-width: 500px) {
-      width: 95vw;
-    }
-  `
-  const SearchItem = styled.div`
-    width: 100%;
-    padding: 5px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: black;
-  `
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -274,7 +274,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
                                                      }} />}
           </SearchInput>
 
-          {viewSearchModal && <SearchContainer>
+          {viewSearchModal && <SearchContainer justify-content={filteredPairs}>
             {filteredPairs && filteredPairs.length !== 0 && filteredPairs.map(pair => (
               <NavLink to={`/token0Id=${pair.token0Address}?token1Id=${pair.token1Address}`} style={{ width: "100%" }}
                        onClick={() => {
