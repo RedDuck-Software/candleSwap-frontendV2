@@ -551,6 +551,7 @@ export default {
 
   unsubscribeBars: (subscriberUID) => {
     console.log("[unsubscribeBars]: Method call with subscriberUID:", subscriberUID);
+    subscriberUID = subscriberUID.replace(/[^0-9]/g, '');
     unsubscribeFromStream(subscriberUID);
   }
 };
