@@ -95,7 +95,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       if (localStorage.getItem("customPairs")) {
         const localStoragePairs = JSON.parse(localStorage.getItem("customPairs"));
         allSymbols = [...allSymbols, ...localStoragePairs];
-      }
+      } 
       initPairs(allSymbols);
       setFilteredPairs(allSymbols);
     })();
@@ -266,7 +266,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
 
           <SearchInput >
             <Input size="large" placeholder={placeholder} prefix={<SearchOutlined />} value={searchQuery}
-                   onChange={onChange} showSearch onFocus={() => setViewSearchModal(true)} />
+                   onChange={onChange} onFocus={() => setViewSearchModal(true)} />
             {viewSearchModal && <CloseSquareOutlined style={{ fontSize: "20px", cursor: "pointer", color: "white" }}
                                                      onClick={() => {
                                                        setViewSearchModal(false);
@@ -276,7 +276,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
 
           {viewSearchModal && <SearchContainer justify-content={filteredPairs}>
             {filteredPairs && filteredPairs.length !== 0 && filteredPairs.map(pair => (
-              <NavLink to={`/token0Id=${pair.token0Address}?token1Id=${pair.token1Address}`} style={{ width: "100%" }}
+              <NavLink key={pair.token0Address/pair.token1Address} to={`/token0Id=${pair.token0Address}?token1Id=${pair.token1Address}`} style={{ width: "100%" }}
                        onClick={() => {
                          setViewSearchModal(false);
                          setSearchQuery("");

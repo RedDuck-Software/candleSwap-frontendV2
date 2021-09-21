@@ -1,42 +1,52 @@
 // Make requests to  Bitquery API
 import * as axios from 'axios'
 
+// Index of ApiKeys
+let idx = 0
+
 export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, resolution, typeInterval) {
-    console.log(token0Id, token1Id, sinceDate, tillDate, resolution, typeInterval)
+    const apiKeys = ['BQYTp6I0POiej43Mc7LZrZl8MNQuQM0P','BQYkMIRqKAiTJTRNRSd2syo38DEep2dQ', 'BQYDtvybBM5ns6gEpVoNoepHpCBXUz72']
+    console.log('Props in helpers: ', token0Id, token1Id, sinceDate, tillDate, resolution, typeInterval)
     return await axios({
         url: 'https://graphql.bitquery.io',
         method: 'post',
+        headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": apiKeys[idx]
+        },
         data: {
             query: `
-      {
-  ethereum(network: bsc) {
-    dexTrades(options: {limit: 2000, asc: "timeInterval.${typeInterval}"}, 
-      date: {since:"${sinceDate}", till:"${tillDate}"}
-      exchangeName: {in: ["Pancake", "Pancake v2"]}, 
-      baseCurrency: {is: "${token0Id}"}, 
-      quoteCurrency: {is: "${token1Id}"}) {
-      
-      
-      timeInterval {
-        ${resolution}
-      }
-      
-      maximum_price: quotePrice(calculate: maximum)
-      minimum_price: quotePrice(calculate: minimum)
-      open_price: minimum(of: block get: quote_price)
-      close_price: maximum(of: block get: quote_price)
-    }
-  }
-}
-      `,
-        }
+                    {   
+                        ethereum(network: bsc) {
+                        dexTrades(options: {limit: 2000, asc: "timeInterval.${typeInterval}"}, 
+                        date: {since:"${sinceDate}", till:"${tillDate}"}
+                        exchangeName: {in: ["Pancake", "Pancake v2"]}, 
+                        baseCurrency: {is: "${token0Id}"}, 
+                        quoteCurrency: {is: "${token1Id}"}) {
+
+                        timeInterval {
+                            ${resolution}
+                        }
+
+                        maximum_price: quotePrice(calculate: maximum)
+                        minimum_price: quotePrice(calculate: minimum)
+                        open_price: minimum(of: block get: quote_price)
+                        close_price: maximum(of: block get: quote_price)
+                    }   
+                }
+            }
+            `,
+        }   
     }).then((result) => {
         console.log('Its a result: ',result.data)
         return result.data.data.ethereum.dexTrades
     }).catch((error) => {
         console.log('Its an error: ', error)
+        idx++
+        return data.length = 0
     })
 }
+
 export const getPairs = async () => {
     return await fetch('https://min-api.cryptocompare.com/data/v3/all/exchanges').then(response => response.json())
 }

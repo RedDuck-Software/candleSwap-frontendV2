@@ -120,6 +120,7 @@ export function unsubscribeFromStream(subscriberUID) {
     if (handlerIndex !== -1) {
       // remove from handlers
       subscriptionItem.handlers.splice(handlerIndex, 1)
+      console.log('Subscription Item: ', subscriptionItem.handlers)
 
       if (subscriptionItem.handlers.length === 0) {
         // unsubscribe from the channel, if it was the last handler

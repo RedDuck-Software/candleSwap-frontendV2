@@ -34,7 +34,7 @@ export class TVChartContainer extends React.PureComponent {
       // BEWARE: no trailing slash is expected in feed URL
       datafeed: Datafeed,
       interval: this.props.interval,
-      container_id: this.props.containerId,
+      container: this.props.containerId,
       library_path: this.props.libraryPath,
 
       locale: getLanguageFromURL() || "en",
@@ -63,7 +63,7 @@ export class TVChartContainer extends React.PureComponent {
       // BEWARE: no trailing slash is expected in feed URL
       datafeed: Datafeed,
       interval: this.props.interval,
-      container_id: this.props.containerId,
+      container: this.props.containerId,
       library_path: this.props.libraryPath,
 
       locale: getLanguageFromURL() || "en",
