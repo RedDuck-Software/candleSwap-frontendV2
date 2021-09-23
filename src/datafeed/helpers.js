@@ -5,7 +5,12 @@ import * as axios from 'axios'
 let idx = 0
 
 export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, resolution, typeInterval) {
-    const apiKeys = ['BQYTp6I0POiej43Mc7LZrZl8MNQuQM0P','BQYkMIRqKAiTJTRNRSd2syo38DEep2dQ', 'BQYDtvybBM5ns6gEpVoNoepHpCBXUz72']
+    const apiKeys = ['BQYTp6I0POiej43Mc7LZrZl8MNQuQM0P','BQYkMIRqKAiTJTRNRSd2syo38DEep2dQ', 'BQYDtvybBM5ns6gEpVoNoepHpCBXUz72', 'BQYOK9ZAHroyH6KgwCTBdWOuFadBPLZb', 'BQYDfB4NR6yO3G6VaH8ayi6hREpZqePW', 'BQYYvx1qYnz6V4P0RQ6ywSn8z0nFF8gd', 'BQYIhrvTBsUD14RBSdKZiR9zZrIqfqhS', 'BQYvXrXt5zSJ1rJ8PDRQMyzLmXr00wqs',
+    'BQYEgh0U40hPFWgn5stFrDTYgseF1won', 'BQYHjS4INC7WbmbxYZUG7zNgW2DmlEcx',
+    'BQYziaXTLiDepo2twN4MIMQhhxPt4oH9', 'BQYtyJM0Nrp3VBCCcTSYNWdkiItt4Msn',
+    'BQYvColro9sbnOFvjZXIFlQJaJiVKgya', 'BQYq13Ac22iqEKqnqQhLuvnk5ZR3qs16',
+    'BQYAggaFkvM2y9cYW79SeauFMdXrNsQ4'
+]
     console.log('Props in helpers: ', token0Id, token1Id, sinceDate, tillDate, resolution, typeInterval)
     return await axios({
         url: 'https://graphql.bitquery.io',
