@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import styled from 'styled-components'
+import styled from "styled-components";
 import "./App.css";
 import { TVChartContainer } from "./components/TVChartContainer/index";
 import { Button, Empty, Input, Modal, notification } from "antd";
@@ -19,12 +19,12 @@ const SearchInputContainer = styled.div`
   @media (max-width: 500px) {
     width: 95vw;
   }
-`
+`;
 const SearchInput = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-`
+`;
 const SearchContainer = styled.div`
   width: 500px;
   height: 400px;
@@ -34,18 +34,19 @@ const SearchContainer = styled.div`
   position: absolute;
   left: 0;
   top: 100%;
-  background: #EEEAE7;
-  borderRadius: 0 0 10px 10px;
+  background: #eeeae7;
+  borderradius: 0 0 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 0px 0 10px 10px;
-  justify-сontent: ${(filteredPairs) => filteredPairs?.length !== 0 ? "unset" : "center"};
+  justify-сontent: ${(filteredPairs) =>
+    filteredPairs?.length !== 0 ? "unset" : "center"};
 
   @media (max-width: 500px) {
     width: 95vw;
   }
-`
+`;
 const SearchItem = styled.div`
   width: 100%;
   padding: 5px 10px;
@@ -53,7 +54,7 @@ const SearchItem = styled.div`
   align-items: center;
   justify-content: space-between;
   color: black;
-`
+`;
 
 const App = ({ pairs, initPairs, isInitialized, addPair }) => {
   const location = useLocation();
@@ -73,37 +74,115 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       let allSymbols = [];
       const pairs = data.Data["Binance"].pairs;
       for (const leftPairPart of Object.keys(pairs)) {
-        const symbols = pairs[leftPairPart].map(rightPairPart => {
+        const symbols = pairs[leftPairPart].map((rightPairPart) => {
           return {
             token0Symbol: updateToValidSymbol(leftPairPart),
-            token1Symbol: updateToValidSymbol(rightPairPart)
+            token1Symbol: updateToValidSymbol(rightPairPart),
           };
         });
         allSymbols = [...allSymbols, ...symbols];
       }
-      allSymbols = allSymbols.filter(symbol => {
-        const token1 = tokenList.find(token => symbol.token0Symbol === token.symbol);
-        const token2 = tokenList.find(token => symbol.token1Symbol === token.symbol);
-        return !!(token1 && token2);
-      }).map(pair => {
-        const token0Address = tokenList.find(token => pair.token0Symbol === token.symbol).address;
-        const token1Address = tokenList.find(token => pair.token1Symbol === token.symbol).address;
-        return {
-          ...pair, token0Address, token1Address
-        };
-      });
+      allSymbols = allSymbols
+        .filter((symbol) => {
+          const token1 = tokenList.find(
+            (token) => symbol.token0Symbol === token.symbol
+          );
+          const token2 = tokenList.find(
+            (token) => symbol.token1Symbol === token.symbol
+          );
+          return !!(token1 && token2);
+        })
+        .map((pair) => {
+          const token0Address = tokenList.find(
+            (token) => pair.token0Symbol === token.symbol
+          ).address;
+          const token1Address = tokenList.find(
+            (token) => pair.token1Symbol === token.symbol
+          ).address;
+          return {
+            ...pair,
+            token0Address,
+            token1Address,
+          };
+        });
       if (localStorage.getItem("customPairs")) {
-        const localStoragePairs = JSON.parse(localStorage.getItem("customPairs"));
-        allSymbols = [...allSymbols, ...localStoragePairs];
-      } 
+        let localStoragePairs = JSON.parse(localStorage.getItem("customPairs"));
+        if (location.pathname && location.search) {
+          const [token0Address, token1Address] = [
+            location.pathname.split("=")[1].trim(),
+            location.search.split("=")[1].trim(),
+          ];
+          const isExist = !!localStoragePairs.find(
+            (pair) =>
+              pair.token0Address.toLowerCase() ===
+                token0Address.toLowerCase() &&
+              pair.token1Address.toLowerCase() === token1Address.toLowerCase()
+          );
+          if (isExist) {
+            allSymbols = [...allSymbols, ...localStoragePairs];
+          } else {
+            const [token0Symbol, token1Symbol] = await Promise.all([
+              getTokenSymbol(token0Address),
+              getTokenSymbol(token1Address),
+            ]);
+            localStoragePairs = [
+              ...localStoragePairs,
+              {
+                token0Address,
+                token1Address,
+                token0Symbol,
+                token1Symbol,
+              },
+            ];
+            localStorage.setItem(
+              "customPairs",
+              JSON.stringify([...localStoragePairs])
+            );
+            allSymbols = [...allSymbols, ...localStoragePairs];
+          }
+        } else {
+          allSymbols = [...allSymbols, ...localStoragePairs];
+        }
+      } else {
+        if (location.pathname && location.search) {
+          const [token0Address, token1Address] = [
+            location.pathname.split("=")[1].trim(),
+            location.search.split("=")[1].trim(),
+          ];
+          const [token0Symbol, token1Symbol] = await Promise.all([
+            getTokenSymbol(token0Address),
+            getTokenSymbol(token1Address),
+          ]);
+          const localStoragePairs = [
+            {
+              token0Address,
+              token1Address,
+              token0Symbol,
+              token1Symbol,
+            },
+          ];
+          localStorage.setItem(
+            "customPairs",
+            JSON.stringify([...localStoragePairs])
+          );
+          allSymbols = [...allSymbols, ...localStoragePairs];
+        }
+      }
       initPairs(allSymbols);
       setFilteredPairs(allSymbols);
     })();
   }, []);
   useEffect(() => {
     if (isInitialized && location.pathname && location.search) {
-      const [token0Address, token1Address] = [location.pathname.split("=")[1].trim(), location.search.split("=")[1].trim()];
-      const pairInfo = pairs.find(pair => pair.token0Address === token0Address && pair.token1Address === token1Address);
+      const [token0Address, token1Address] = [
+        location.pathname.split("=")[1].trim(),
+        location.search.split("=")[1].trim(),
+      ];
+      const pairInfo = pairs.find(
+        (pair) =>
+          pair.token0Address === token0Address &&
+          pair.token1Address === token1Address
+      );
       setPlaceholder(`${pairInfo.token0Symbol}/${pairInfo.token1Symbol}`);
       setChartsPair(pairInfo);
     }
@@ -113,45 +192,70 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       if (new RegExp("0x\\w+", "i").test(searchQuery)) {
         (async () => {
           if (/^0x[a-fA-F0-9]{40}$/.test(searchQuery)) {
-            const wbnb = tokenList.find(token => token.symbol === "WBNB");
+            const wbnb = tokenList.find((token) => token.symbol === "WBNB");
             const symbolSearch = await getTokenSymbol(searchQuery);
             const twoPairs = [
               {
                 token0Symbol: wbnb.symbol,
                 token1Symbol: symbolSearch,
                 token0Address: wbnb.address,
-                token1Address: searchQuery
+                token1Address: searchQuery,
               },
               {
                 token0Symbol: symbolSearch,
                 token1Symbol: wbnb.symbol,
                 token0Address: searchQuery,
-                token1Address: wbnb.address
-              }
+                token1Address: wbnb.address,
+              },
             ];
 
             if (localStorage.getItem("customPairs")) {
-              const previousPairs = JSON.parse(localStorage.getItem("customPairs"));
-              const isFirstExist = !!previousPairs.find(pair => pair.token0Address.toLowerCase() === twoPairs[0].token0Address.toLowerCase() &&
-                pair.token1Address.toLowerCase() === twoPairs[0].token1Address.toLowerCase());
-              const isSecondExist = !!previousPairs.find(pair => pair.token0Address.toLowerCase() === twoPairs[1].token0Address.toLowerCase() &&
-                pair.token1Address.toLowerCase() === twoPairs[1].token1Address.toLowerCase());
+              const previousPairs = JSON.parse(
+                localStorage.getItem("customPairs")
+              );
+              const isFirstExist = !!previousPairs.find(
+                (pair) =>
+                  pair.token0Address.toLowerCase() ===
+                    twoPairs[0].token0Address.toLowerCase() &&
+                  pair.token1Address.toLowerCase() ===
+                    twoPairs[0].token1Address.toLowerCase()
+              );
+              const isSecondExist = !!previousPairs.find(
+                (pair) =>
+                  pair.token0Address.toLowerCase() ===
+                    twoPairs[1].token0Address.toLowerCase() &&
+                  pair.token1Address.toLowerCase() ===
+                    twoPairs[1].token1Address.toLowerCase()
+              );
               const twoPairsForLS = twoPairs.filter((pair, index) => {
-                return (index == 0 && !isFirstExist) || (index == 1 && !isSecondExist);
+                return (
+                  (index == 0 && !isFirstExist) ||
+                  (index == 1 && !isSecondExist)
+                );
               });
-              twoPairsForLS.forEach(item => addPair(item));
+              twoPairsForLS.forEach((item) => addPair(item));
               localStorage.removeItem("customPairs");
-              localStorage.setItem("customPairs", JSON.stringify([...previousPairs, ...twoPairsForLS]));
-            }else{
-              addPair(twoPairs[0])
-              addPair(twoPairs[1])
-              localStorage.setItem("customPairs", JSON.stringify([...twoPairs]));
+              localStorage.setItem(
+                "customPairs",
+                JSON.stringify([...previousPairs, ...twoPairsForLS])
+              );
+            } else {
+              addPair(twoPairs[0]);
+              addPair(twoPairs[1]);
+              localStorage.setItem(
+                "customPairs",
+                JSON.stringify([...twoPairs])
+              );
             }
             setFilteredPairs(twoPairs);
           }
         })();
       } else {
-        const filteredMiddleware = pairs.filter(pair => new RegExp(searchQuery, "i").test(`${pair.token0Symbol}/${pair.token1Symbol}`));
+        const filteredMiddleware = pairs.filter((pair) =>
+          new RegExp(searchQuery, "i").test(
+            `${pair.token0Symbol}/${pair.token1Symbol}`
+          )
+        );
         setFilteredPairs(filteredMiddleware);
       }
     }
@@ -168,16 +272,18 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
   };
 
   const handleOk = async () => {
-    if (firstTokenAddress.toLowerCase() === secondTokenAddress.toLowerCase()) return;
-    const isExistingPair = pairs.find(pair => {
-      return pair.token0Address.toLowerCase() === firstTokenAddress.toLowerCase() &&
-        pair.token1Address.toLowerCase() === secondTokenAddress.toLowerCase();
+    if (firstTokenAddress.toLowerCase() === secondTokenAddress.toLowerCase())
+      return;
+    const isExistingPair = pairs.find((pair) => {
+      return (
+        pair.token0Address.toLowerCase() === firstTokenAddress.toLowerCase() &&
+        pair.token1Address.toLowerCase() === secondTokenAddress.toLowerCase()
+      );
     });
     if (isExistingPair) {
       notification.info({
         message: "Already exist",
-        description:
-          "Pair is already exist."
+        description: "Pair is already exist.",
       });
       setIsModalVisible(false);
       setFirstTokenAddress("");
@@ -185,17 +291,22 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       return;
     }
 
-    if (/^0x[a-fA-F0-9]{40}$/.test(firstTokenAddress) && /^0x[a-fA-F0-9]{40}$/.test(secondTokenAddress)) {
+    if (
+      /^0x[a-fA-F0-9]{40}$/.test(firstTokenAddress) &&
+      /^0x[a-fA-F0-9]{40}$/.test(secondTokenAddress)
+    ) {
       setConfirmLoading(true);
       let symbols;
       try {
-        symbols = await Promise.all([getTokenSymbol(firstTokenAddress), getTokenSymbol(secondTokenAddress)]);
+        symbols = await Promise.all([
+          getTokenSymbol(firstTokenAddress),
+          getTokenSymbol(secondTokenAddress),
+        ]);
         console.log("");
       } catch (e) {
         notification.error({
           message: "Ops...",
-          description:
-            "We didn't find a pair."
+          description: "We didn't find a pair.",
         });
         setConfirmLoading(false);
         return;
@@ -204,25 +315,36 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
       if (localStorage.getItem("customPairs")) {
         const previousPairs = JSON.parse(localStorage.getItem("customPairs"));
         localStorage.removeItem("customPairs");
-        localStorage.setItem("customPairs", JSON.stringify([...previousPairs, {
-          token0Symbol,
-          token1Symbol,
-          token0Address: firstTokenAddress,
-          token1Address: secondTokenAddress
-        }]));
+        localStorage.setItem(
+          "customPairs",
+          JSON.stringify([
+            ...previousPairs,
+            {
+              token0Symbol,
+              token1Symbol,
+              token0Address: firstTokenAddress,
+              token1Address: secondTokenAddress,
+            },
+          ])
+        );
       } else {
-        localStorage.setItem("customPairs", JSON.stringify([{
-          token0Symbol,
-          token1Symbol,
-          token0Address: firstTokenAddress,
-          token1Address: secondTokenAddress
-        }]));
+        localStorage.setItem(
+          "customPairs",
+          JSON.stringify([
+            {
+              token0Symbol,
+              token1Symbol,
+              token0Address: firstTokenAddress,
+              token1Address: secondTokenAddress,
+            },
+          ])
+        );
       }
       addPair({
         token0Symbol,
         token1Symbol,
         token0Address: firstTokenAddress,
-        token1Address: secondTokenAddress
+        token1Address: secondTokenAddress,
       });
       setConfirmLoading(false);
       setIsModalVisible(false);
@@ -231,8 +353,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
     } else {
       notification.error({
         message: "Invalid Address",
-        description:
-          "Please enter valid tokens addresses."
+        description: "Please enter valid tokens addresses.",
       });
       return;
     }
@@ -248,63 +369,89 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
 
   return (
     <div className={"App"}>
-
-      <Modal title="Add pair" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
-             confirmLoading={confirmLoading}>
-        <Input placeholder="Enter first token address" allowClear
-               onChange={(e) => setFirstTokenAddress(e.target.value.trim())}
-               value={firstTokenAddress} />
+      <Modal
+        title="Add pair"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        confirmLoading={confirmLoading}
+      >
+        <Input
+          placeholder="Enter first token address"
+          allowClear
+          onChange={(e) => setFirstTokenAddress(e.target.value.trim())}
+          value={firstTokenAddress}
+        />
         <br />
         <br />
-        <Input placeholder="Enter second token address" allowClear
-               onChange={(e) => setSecondTokenAddress(e.target.value.trim())}
-               value={secondTokenAddress} />
+        <Input
+          placeholder="Enter second token address"
+          allowClear
+          onChange={(e) => setSecondTokenAddress(e.target.value.trim())}
+          value={secondTokenAddress}
+        />
       </Modal>
 
       <header>
         <SearchInputContainer>
-
-          <SearchInput >
-            <Input size="large" placeholder={placeholder} prefix={<SearchOutlined />} value={searchQuery}
-                   onChange={onChange} onFocus={() => setViewSearchModal(true)} />
-            {viewSearchModal && <CloseSquareOutlined style={{ fontSize: "20px", cursor: "pointer", color: "white" }}
-                                                     onClick={() => {
-                                                       setViewSearchModal(false);
-                                                       setSearchQuery("");
-                                                     }} />}
+          <SearchInput>
+            <Input
+              size="large"
+              placeholder={placeholder}
+              prefix={<SearchOutlined />}
+              value={searchQuery}
+              onChange={onChange}
+              onFocus={() => setViewSearchModal(true)}
+            />
+            {viewSearchModal && (
+              <CloseSquareOutlined
+                style={{ fontSize: "20px", cursor: "pointer", color: "white" }}
+                onClick={() => {
+                  setViewSearchModal(false);
+                  setSearchQuery("");
+                }}
+              />
+            )}
           </SearchInput>
 
-          {viewSearchModal && <SearchContainer justify-content={filteredPairs}>
-            {filteredPairs && filteredPairs.length !== 0 && filteredPairs.map(pair => (
-              <NavLink key={pair.token0Address/pair.token1Address} to={`/token0Id=${pair.token0Address}?token1Id=${pair.token1Address}`} style={{ width: "100%" }}
-                       onClick={() => {
-                         setViewSearchModal(false);
-                         setSearchQuery("");
-                       }}>
-                <SearchItem>
-                  <div>{`${pair.token0Symbol}/${pair.token1Symbol}`}</div>
-                </SearchItem>
-              </NavLink>
-            ))}
+          {viewSearchModal && (
+            <SearchContainer justify-content={filteredPairs}>
+              {filteredPairs &&
+                filteredPairs.length !== 0 &&
+                filteredPairs.map((pair) => (
+                  <NavLink
+                    key={pair.token0Address / pair.token1Address}
+                    to={`/token0Id=${pair.token0Address}?token1Id=${pair.token1Address}`}
+                    style={{ width: "100%" }}
+                    onClick={() => {
+                      setViewSearchModal(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    <SearchItem>
+                      <div>{`${pair.token0Symbol}/${pair.token1Symbol}`}</div>
+                    </SearchItem>
+                  </NavLink>
+                ))}
 
-            {filteredPairs.length === 0 && (
-              <Empty
-                image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-                imageStyle={{
-                  height: 60
-                }}
-                description={
-                  <span>
-                    We didn't find such a pair in this list.
-                  </span>
-                }
-              >
-                <Button type="primary" onClick={showModal}>Add new pair now</Button>
-              </Empty>
-            )}
-
-          </SearchContainer>}
-        </SearchInputContainer >
+              {filteredPairs.length === 0 && (
+                <Empty
+                  image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                  imageStyle={{
+                    height: 60,
+                  }}
+                  description={
+                    <span>We didn't find such a pair in this list.</span>
+                  }
+                >
+                  <Button type="primary" onClick={showModal}>
+                    Add new pair now
+                  </Button>
+                </Empty>
+              )}
+            </SearchContainer>
+          )}
+        </SearchInputContainer>
       </header>
       <TVChartContainer pair={chartsPair} />
     </div>
@@ -313,7 +460,10 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
 
 const MapStateToProps = (state) => ({
   pairs: state.pairs.pairs,
-  isInitialized: state.pairs.isInitialized
+  isInitialized: state.pairs.isInitialized,
 });
 
-export default connect(MapStateToProps, { initPairs: actionsPairs.initPairs, addPair: actionsPairs.addPair })(App);
+export default connect(MapStateToProps, {
+  initPairs: actionsPairs.initPairs,
+  addPair: actionsPairs.addPair,
+})(App);
