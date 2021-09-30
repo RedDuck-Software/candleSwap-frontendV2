@@ -5,7 +5,7 @@ import "./App.css";
 import { TVChartContainer } from "./components/TVChartContainer/index";
 import { Button, Empty, Input, Modal, notification } from "antd";
 import { NavLink, useLocation } from "react-router-dom";
-import { getPairs, tokenList } from "./datafeed/helpers";
+import { getPairs, tokenList, whitePairsList } from "./datafeed/helpers";
 import { getTokenSymbol, updateToValidSymbol } from "./datafeed/datafeed";
 import { connect } from "react-redux";
 import { actionsPairs } from "./redux/pairs-reducer";
@@ -68,43 +68,12 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
     setSearchQuery(e.target.value.trim());
   };
 
+  // Filling initPairs and setFilteredPairs hooks with pairs
   useEffect(() => {
     (async () => {
-      const data = await getPairs();
       let allSymbols = [];
-      const pairs = data.Data["Binance"].pairs;
-      for (const leftPairPart of Object.keys(pairs)) {
-        const symbols = pairs[leftPairPart].map((rightPairPart) => {
-          return {
-            token0Symbol: updateToValidSymbol(leftPairPart),
-            token1Symbol: updateToValidSymbol(rightPairPart),
-          };
-        });
-        allSymbols = [...allSymbols, ...symbols];
-      }
-      allSymbols = allSymbols
-        .filter((symbol) => {
-          const token1 = tokenList.find(
-            (token) => symbol.token0Symbol === token.symbol
-          );
-          const token2 = tokenList.find(
-            (token) => symbol.token1Symbol === token.symbol
-          );
-          return !!(token1 && token2);
-        })
-        .map((pair) => {
-          const token0Address = tokenList.find(
-            (token) => pair.token0Symbol === token.symbol
-          ).address;
-          const token1Address = tokenList.find(
-            (token) => pair.token1Symbol === token.symbol
-          ).address;
-          return {
-            ...pair,
-            token0Address,
-            token1Address,
-          };
-        });
+      allSymbols = whitePairsList.concat();
+      console.log(allSymbols);
       if (localStorage.getItem("customPairs")) {
         let localStoragePairs = JSON.parse(localStorage.getItem("customPairs"));
         if (location.pathname && location.search) {
@@ -138,7 +107,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
               "customPairs",
               JSON.stringify([...localStoragePairs])
             );
-            allSymbols = [...allSymbols, ...localStoragePairs];
+            allSymbols = [...filteredPairs, ...localStoragePairs];
           }
         } else {
           allSymbols = [...allSymbols, ...localStoragePairs];
@@ -168,6 +137,7 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
           allSymbols = [...allSymbols, ...localStoragePairs];
         }
       }
+      console.log(allSymbols);
       initPairs(allSymbols);
       setFilteredPairs(allSymbols);
     })();
