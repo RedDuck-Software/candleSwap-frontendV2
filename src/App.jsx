@@ -68,14 +68,37 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
     setSearchQuery(e.target.value.trim());
   };
 
+  // This function removes identical pairs from LocalStorage
+  const filterLocalStoragePairs = (pairs, key) => {
+    return [...new Map(pairs.map((item) => [key(item), item])).values()];
+  };
+
+  // This function removes pairs in an object that already exist in LocalStorage
+  const filtratingIdenticalPairs = (mainPairs, additPairs) => {
+    let filteredPairs;
+    return (filteredPairs = mainPairs.filter((mainPair) => {
+      return additPairs.every((additPair) => {
+        return (
+          additPair.token0Symbol !== mainPair.token0Symbol ||
+          additPair.token1Symbol !== mainPair.token1Symbol ||
+          additPair.token0Address !== mainPair.token0Address ||
+          additPair.token1Address !== mainPair.token1Address
+        );
+      });
+    }));
+  };
+
   // Filling initPairs and setFilteredPairs hooks with pairs
   useEffect(() => {
     (async () => {
       let allSymbols = [];
       allSymbols = whitePairsList.concat();
-      console.log(allSymbols);
       if (localStorage.getItem("customPairs")) {
         let localStoragePairs = JSON.parse(localStorage.getItem("customPairs"));
+        localStoragePairs = filterLocalStoragePairs(
+          localStoragePairs,
+          (pair) => pair.token0Address / pair.token1Address
+        );
         if (location.pathname && location.search) {
           const [token0Address, token1Address] = [
             location.pathname.split("=")[1].trim(),
@@ -88,7 +111,11 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
               pair.token1Address.toLowerCase() === token1Address.toLowerCase()
           );
           if (isExist) {
-            allSymbols = [...allSymbols, ...localStoragePairs];
+            const filteredPairs = filtratingIdenticalPairs(
+              whitePairsList,
+              localStoragePairs
+            );
+            allSymbols = [...filteredPairs, ...localStoragePairs];
           } else {
             const [token0Symbol, token1Symbol] = await Promise.all([
               getTokenSymbol(token0Address),
@@ -107,10 +134,18 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
               "customPairs",
               JSON.stringify([...localStoragePairs])
             );
+            const filteredPairs = filtratingIdenticalPairs(
+              whitePairsList,
+              localStoragePairs
+            );
             allSymbols = [...filteredPairs, ...localStoragePairs];
           }
         } else {
-          allSymbols = [...allSymbols, ...localStoragePairs];
+          const filteredPairs = filtratingIdenticalPairs(
+            whitePairsList,
+            localStoragePairs
+          );
+          allSymbols = [...filteredPairs, ...localStoragePairs];
         }
       } else {
         if (location.pathname && location.search) {
@@ -134,10 +169,13 @@ const App = ({ pairs, initPairs, isInitialized, addPair }) => {
             "customPairs",
             JSON.stringify([...localStoragePairs])
           );
-          allSymbols = [...allSymbols, ...localStoragePairs];
+          const filteredPairs = filtratingIdenticalPairs(
+            whitePairsList,
+            localStoragePairs
+          );
+          allSymbols = [...filteredPairs, ...localStoragePairs];
         }
       }
-      console.log(allSymbols);
       initPairs(allSymbols);
       setFilteredPairs(allSymbols);
     })();

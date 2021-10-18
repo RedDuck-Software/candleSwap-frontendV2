@@ -477,6 +477,7 @@ export default {
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
     const { from, to, firstDataRequest } = periodParams;
     console.log("[getBars]: Method call", symbolInfo, resolution, from, to);
+    console.log("Start time", from)
     const urlParameters = {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
