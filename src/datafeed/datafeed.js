@@ -419,7 +419,7 @@ export default {
   ) => {
     console.log("[resolveSymbol]: Method call", symbolName);
     const symbols = await getAllSymbols();
-    const symbolItem = symbols.find(({ full_name }) => full_name === symbolName);             
+    const symbolItem = symbols.find(({ full_name }) => full_name === symbolName);         
     const [symbol0, symbol1] = symbolItem.symbol.split("/");
     let symbol0Address;
     symbol0Address = tokenList.find(token => token.symbol.trim().toLowerCase() === symbol0.trim().toLowerCase())?.address;
@@ -477,12 +477,11 @@ export default {
   getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
     const { from, to, firstDataRequest } = periodParams;
     console.log("[getBars]: Method call", symbolInfo, resolution, from, to);
-    console.log("Start time", from)
     const urlParameters = {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
       periodSeconds: resolutionToSeconds(resolution),
-      startTime: `${new Date(from * 100).toISOString()}`,
+      startTime: `${new Date(from * 1000).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
       intervalType: resolutionToSeconds(resolution).split("(")[0]
     };
