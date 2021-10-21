@@ -23,7 +23,7 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
             query: `
                     {   
                         ethereum(network: bsc) {
-                        dexTrades(options: {limit: 2000, asc: "timeInterval.${typeInterval}"}, 
+                        dexTrades(options: {limit: 15000, asc: "timeInterval.${typeInterval}"}, 
                         date: {since:"${sinceDate}", till:"${tillDate}"}
                         exchangeName: {in: ["Pancake", "Pancake v2"]}, 
                         baseCurrency: {is: "${token0Id}"}, 
@@ -10256,12 +10256,6 @@ export const whitePairsList = [
         token0Address: "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
-    // {
-    //     token0Symbol: "LIT",
-    //     token1Symbol: "WBNB",
-    //     token0Address: "0xb59490aB09A0f526Cc7305822aC65f2Ab12f9723",
-    //     token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
-    // },
     {
         token0Symbol: "BTCB",
         token1Symbol: "USDC",
@@ -10291,6 +10285,12 @@ export const whitePairsList = [
         token1Symbol: "USDT",
         token0Address: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
         token1Address: "0x55d398326f99059fF775485246999027B3197955"
+    },
+    {
+        token0Symbol: "XRP",
+        token1Symbol: "BUSD",
+        token0Address: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
+        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
     {
         token0Symbol: "HARD",
@@ -10336,12 +10336,6 @@ export const whitePairsList = [
     },
     {
         token0Symbol: "POLS",
-        token1Symbol: "USDT",
-        token0Address: "0x7e624FA0E1c4AbFD309cC15719b7E2580887f570",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "POLS",
         token1Symbol: "BUSD",
         token0Address: "0x7e624FA0E1c4AbFD309cC15719b7E2580887f570",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
@@ -10357,13 +10351,7 @@ export const whitePairsList = [
         token1Symbol: "BUSD",
         token0Address: "0x9f589e3eabe42ebC94A44727b3f3531C0c877809",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-    },
-    {
-        token0Symbol: "DEGO",
-        token1Symbol: "BUSD",
-        token0Address: "0x3FdA9383A84C05eC8f7630Fe10AdF1fAC13241CC",
-        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-    },
+    },  
     {
         token0Symbol: "EOS",
         token1Symbol: "BUSD",
@@ -10404,18 +10392,6 @@ export const whitePairsList = [
         token0Symbol: "BUSD",
         token1Symbol: "USDT",
         token0Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "PSG",
-        token1Symbol: "BUSD",
-        token0Address: "0xBc5609612b7C44BEf426De600B5fd1379DB2EcF1",
-        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-    },
-    {
-        token0Symbol: "PSG",
-        token1Symbol: "USDT",
-        token0Address: "0xBc5609612b7C44BEf426De600B5fd1379DB2EcF1",
         token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
@@ -10480,12 +10456,6 @@ export const whitePairsList = [
     },
     {
         token0Symbol: "LTC",
-        token1Symbol: "BTCB",
-        token0Address: "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
-        token1Address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"
-    },
-    {
-        token0Symbol: "LTC",
         token1Symbol: "BUSD",
         token0Address: "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
@@ -10501,12 +10471,6 @@ export const whitePairsList = [
         token1Symbol: "ETH",
         token0Address: "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
         token1Address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8"
-    },
-    {
-        token0Symbol: "LTC",
-        token1Symbol: "USDT",
-        token0Address: "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
         token0Symbol: "MATIC",
@@ -10605,12 +10569,6 @@ export const whitePairsList = [
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
     {
-        token0Symbol: "REEF",
-        token1Symbol: "USDT",
-        token0Address: "0xF21768cCBC73Ea5B6fd3C687208a7c2def2d966e",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
         token0Symbol: "ONT",
         token1Symbol: "BUSD",
         token0Address: "0xFd7B3A77848f1C2D67E05E54d78d174a0C850335",
@@ -10660,12 +10618,6 @@ export const whitePairsList = [
     },
     {
         token0Symbol: "FIL",
-        token1Symbol: "USDT",
-        token0Address: "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "FIL",
         token1Symbol: "WBNB",
         token0Address: "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
@@ -10699,6 +10651,12 @@ export const whitePairsList = [
         token1Symbol: "BUSD",
         token0Address: "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
+    },
+    {
+        token0Symbol: "TWT",
+        token1Symbol: "BTCB",
+        token0Address: "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
+        token1Address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"
     },
     {
         token0Symbol: "NEAR",
@@ -10725,6 +10683,12 @@ export const whitePairsList = [
         token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
+        token0Symbol: "TRX",
+        token1Symbol: "ETH",
+        token0Address: "0x85EAC5Ac2F758618dFa09bDbe0cf174e7d574D5B",
+        token1Address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8"
+    },  
+    {
         token0Symbol: "DOT",
         token1Symbol: "WBNB",
         token0Address: "0x7083609fCE4d1d8Dc0C979AAb8c869Ea2C873402",
@@ -10747,12 +10711,6 @@ export const whitePairsList = [
         token1Symbol: "WBNB",
         token0Address: "0xAe9269f27437f0fcBC232d39Ec814844a51d6b8f",
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
-    },
-    {
-        token0Symbol: "BURGER",
-        token1Symbol: "BUSD",
-        token0Address: "0xAe9269f27437f0fcBC232d39Ec814844a51d6b8f",
-        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
     {
         token0Symbol: "INJ",
@@ -10816,12 +10774,6 @@ export const whitePairsList = [
     },
     {
         token0Symbol: "1INCH",
-        token1Symbol: "USDT",
-        token0Address: "0x111111111117dC0aa78b770fA6A738034120C302",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "1INCH",
         token1Symbol: "BUSD",
         token0Address: "0x111111111117dC0aa78b770fA6A738034120C302",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
@@ -10837,12 +10789,6 @@ export const whitePairsList = [
         token1Symbol: "BUSD",
         token0Address: "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-    },
-    {
-        token0Symbol: "LINK",
-        token1Symbol: "USDT",
-        token0Address: "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
         token0Symbol: "BEL",
@@ -10922,6 +10868,12 @@ export const whitePairsList = [
         token0Address: "0xA8c2B8eec3d368C0253ad3dae65a5F2BBB89c929",
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
     },
+    {
+        token0Symbol: "CTK",
+        token1Symbol: "USDT",
+        token0Address: "0xA8c2B8eec3d368C0253ad3dae65a5F2BBB89c929",
+        token1Address: "0x55d398326f99059fF775485246999027B3197955"
+    },  
     {
         token0Symbol: "DIA",
         token1Symbol: "BUSD",
@@ -11011,6 +10963,12 @@ export const whitePairsList = [
         token1Symbol: "USDT",
         token0Address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
         token1Address: "0x55d398326f99059fF775485246999027B3197955"
+    },
+    {
+        token0Symbol: "SOL",
+        token1Symbol: "WBNB",
+        token0Address: "0x7242E0090c795d7170F3082a640559ae79d487d1",
+        token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
     },
     {
         token0Symbol: "BEAR",
@@ -11109,18 +11067,6 @@ export const whitePairsList = [
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
     },
     {
-        token0Symbol: "AXS",
-        token1Symbol: "USDT",
-        token0Address: "0x715D400F88C167884bbCc41C5FeA407ed4D2f8A0",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "CVP",
-        token1Symbol: "BUSD",
-        token0Address: "0x5Ec3AdBDae549Dce842e24480Eb2434769e22B2E",
-        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
-    },
-    {
         token0Symbol: "AVAX",
         token1Symbol: "WBNB",
         token0Address: "0x1CE0c2827e2eF14D5C4f29a091d735A204794041",
@@ -11209,12 +11155,6 @@ export const whitePairsList = [
         token1Symbol: "WBNB",
         token0Address: "0x03fF0ff224f904be3118461335064bB48Df47938",
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
-    },
-    {
-        token0Symbol: "MIR",
-        token1Symbol: "USDT",
-        token0Address: "0x5B6DcF557E2aBE2323c48445E8CC948910d8c2c9",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
         token0Symbol: "RAMP",
@@ -11313,6 +11253,12 @@ export const whitePairsList = [
         token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
     {
+        token0Symbol: "BTCST",
+        token1Symbol: "BTCB",
+        token0Address: "0x78650B139471520656b9E7aA7A5e9276814a38e9",
+        token1Address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"
+    },
+    {
         token0Symbol: "CREAM",
         token1Symbol: "BUSD",
         token0Address: "0xd4CB328A82bDf5f03eB737f37Fa6B370aef3e888",
@@ -11323,12 +11269,6 @@ export const whitePairsList = [
         token1Symbol: "WBNB",
         token0Address: "0xd4CB328A82bDf5f03eB737f37Fa6B370aef3e888",
         token1Address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
-    },
-    {
-        token0Symbol: "SFP",
-        token1Symbol: "USDT",
-        token0Address: "0xD41FDb03Ba84762dD66a0af1a6C8540FF1ba5dfb",
-        token1Address: "0x55d398326f99059fF775485246999027B3197955"
     },
     {
         token0Symbol: "SFP",

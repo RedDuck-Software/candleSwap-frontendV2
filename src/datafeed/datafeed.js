@@ -481,7 +481,7 @@ export default {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
       periodSeconds: resolutionToSeconds(resolution),
-      startTime: `${new Date(from * 1000).toISOString()}`,
+      startTime: `${new Date(from * 992).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
       intervalType: resolutionToSeconds(resolution).split("(")[0]
     };
