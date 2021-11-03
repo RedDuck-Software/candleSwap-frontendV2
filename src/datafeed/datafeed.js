@@ -312,7 +312,9 @@ const ERC20_ABI = [
   }, { "stateMutability": "payable", "type": "receive" }];
 
 export const getTokenSymbol = (address) => {
-  const provider = new ethers.providers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+  const provider = new ethers.providers.JsonRpcProvider(
+    "https://bsc-dataseed.binance.org/"
+  );
   const TokenContract = new ethers.Contract(address, ERC20_ABI, provider);
   return TokenContract.symbol();
 };
@@ -345,7 +347,6 @@ export const updateToValidSymbol = (symbol) => {
     default:
       return symbol;
   }
-
 };
 
 async function getAllSymbols() {
@@ -474,54 +475,212 @@ export default {
     onSymbolResolvedCallback(symbolInfo);
   },
 
-  getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
+  getBars: async function (
+    symbolInfo,
+    resolution,
+    periodParams,
+    onHistoryCallback,
+    onErrorCallback
+  ) {
+    // this._getBars(
+    //   symbolInfo,
+    //   resolution,
+    //   periodParams,
+    //   onHistoryCallback,
+    //   onErrorCallback
+    // );
+    if (symbolInfo.description.split('/')[1] === 'WBNB') {
+      return this.getBarsConvertedToUsdt(
+        symbolInfo,
+        resolution,
+        periodParams,
+        onHistoryCallback,
+        onErrorCallback
+      )
+    } else {
+      return this._getBars(
+        symbolInfo,
+        resolution,
+        periodParams,
+        onHistoryCallback,
+        onErrorCallback
+      );
+    }    
+  },
+  getBarsConvertedToUsdt: async function (
+    symbolInfo,
+    resolution,
+    periodParams,
+    onHistoryCallback,
+    onErrorCallback
+  ) {
+    const bnbUsdtPair = "WBNB/USDT";
     const { from, to, firstDataRequest } = periodParams;
-    console.log("[getBars]: Method call", symbolInfo, resolution, from, to);
+    console.log(from, to,firstDataRequest )
+    const symbols = await getAllSymbols();
+    const symbolItem = symbols.find(({ symbol }) => symbol === bnbUsdtPair);
+    const [symbol1, symbol2] = symbolItem.symbol.split("/");
+    const token1Usdt = tokenList.find((token) => symbol1 === token.symbol);
+    const token2Usdt = tokenList.find((token) => symbol2 === token.symbol);
+    const urlParametersUsdt = {
+      token0Id: token1Usdt.address,
+      token1Id: token2Usdt.address,
+      periodSeconds: resolutionToSeconds(resolution),
+      startTime: `${new Date(from * 992).toISOString()}`,
+      endTime: `${new Date(to * 1000).toISOString()}`,
+      intervalType: resolutionToSeconds(resolution).split("(")[0],
+    };
     const urlParameters = {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
       periodSeconds: resolutionToSeconds(resolution),
       startTime: `${new Date(from * 992).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
-      intervalType: resolutionToSeconds(resolution).split("(")[0]
+      intervalType: resolutionToSeconds(resolution).split("(")[0],
     };
     try {
-      let data = await makeApiRequest(urlParameters.token0Id, urlParameters.token1Id, urlParameters.startTime, urlParameters.endTime, urlParameters.periodSeconds, urlParameters.intervalType);
+      Promise.all([
+        makeApiRequest(
+          urlParametersUsdt.token0Id,
+          urlParametersUsdt.token1Id,
+          urlParametersUsdt.startTime,
+          urlParametersUsdt.endTime,
+          urlParametersUsdt.periodSeconds,
+          urlParametersUsdt.intervalType
+        ),
+        makeApiRequest(
+          urlParameters.token0Id,
+          urlParameters.token1Id,
+          urlParameters.startTime,
+          urlParameters.endTime,
+          urlParameters.periodSeconds,
+          urlParameters.intervalType
+        ),
+      ]).then(([usdtPair, currentPair]) => {
+        usdtPair = usdtPair.reduce((acc, curr) => {
+          acc[curr.timeInterval[Object.keys(curr.timeInterval)[0]]] = curr;
+          return acc;
+        }, {});
+        console.log('currBef', currentPair[0])
+        console.log('usdtBef', usdtPair)
+        currentPair = currentPair.map((item) => {
+          const timeInterval =
+            item.timeInterval[Object.keys(item.timeInterval)[0]];
+          const pair = usdtPair[timeInterval];
+          return {
+            ...item,
+            close_price: parseFloat(item.close_price) * parseFloat(pair.close_price).toString(),
+            maximum_price: parseFloat(item.maximum_price) * parseFloat(pair.maximum_price).toString(),
+            minimum_price: parseFloat(item.minimum_price) * parseFloat(pair.minimum_price).toString(),
+            open_price: parseFloat(item.open_price) * parseFloat(pair.open_price).toString(),
+          }
+        });
+        console.log('currAft', currentPair[0])
+        if (currentPair.length === 0 || !currentPair) {
+          // "noData" should be set if there is no data in the requested period.
+          onHistoryCallback([], {
+            noData: true,
+          });
+          return;
+        }
+        let bars = currentPair.map((bar) => ({
+          time: new Date(bar.timeInterval[urlParameters.intervalType]).getTime(),
+          low: bar["minimum_price"],
+          high: bar["maximum_price"],
+          open: bar["open_price"],
+          close: bar["close_price"],
+        }));
+        let prevBar = null;
+        bars = bars.map((bar) => {
+          if (prevBar) {
+            const isDolbaebPick = +bar.high > +prevBar.high * 8;
+            if (isDolbaebPick) {
+              return {
+                ...bar,
+                high: `${+prevBar.high * 1.2}`,
+              };
+            }
+          }
+          prevBar = bar;
+          return bar;
+        });
+        if (firstDataRequest) {
+          lastBarsCache.set(symbolInfo.full_name, {
+            ...bars[bars.length - 1],
+          });
+        }
+        console.log(`[getBars]: returned ${bars.length} bar(s)`);
+        onHistoryCallback(bars, {
+          noData: false,
+        });
+      });
+    } catch (error) {
+      console.log("[getBars]: Get error", error);
+      onErrorCallback(error);
+    }
+  },
+
+  _getBars: async (
+    symbolInfo,
+    resolution,
+    periodParams,
+    onHistoryCallback,
+    onErrorCallback
+  ) => {
+    const { from, to, firstDataRequest } = periodParams;
+    const urlParameters = {
+      token0Id: symbolInfo.token0Id,
+      token1Id: symbolInfo.token1Id,
+      periodSeconds: resolutionToSeconds(resolution),
+      startTime: `${new Date(from * 992).toISOString()}`,
+      endTime: `${new Date(to * 1000).toISOString()}`,
+      intervalType: resolutionToSeconds(resolution).split("(")[0],
+    };
+    try {
+      let data = await makeApiRequest(
+        urlParameters.token0Id,
+        urlParameters.token1Id,
+        urlParameters.startTime,
+        urlParameters.endTime,
+        urlParameters.periodSeconds,
+        urlParameters.intervalType
+      );
       if (data.length === 0 || !data) {
         // "noData" should be set if there is no data in the requested period.
         onHistoryCallback([], {
-          noData: true
+          noData: true,
         });
         return;
       }
-      let bars = data.map(bar => ({
+      let bars = data.map((bar) => ({
         time: new Date(bar.timeInterval[urlParameters.intervalType]).getTime(),
         low: bar["minimum_price"],
         high: bar["maximum_price"],
         open: bar["open_price"],
-        close: bar["close_price"]
+        close: bar["close_price"],
       }));
       let prevBar = null;
-      bars = bars.map(bar => {
-        if(prevBar){
-          const isDolbaebPick = +bar.high > (+prevBar.high * 8);
-          if(isDolbaebPick){
+      bars = bars.map((bar) => {
+        if (prevBar) {
+          const isDolbaebPick = +bar.high > +prevBar.high * 8;
+          if (isDolbaebPick) {
             return {
-              ...bar, high: `${+prevBar.high * 1.2}`
-            }
+              ...bar,
+              high: `${+prevBar.high * 1.2}`,
+            };
           }
         }
         prevBar = bar;
-        return bar
+        return bar;
       });
       if (firstDataRequest) {
         lastBarsCache.set(symbolInfo.full_name, {
-          ...bars[bars.length - 1]
+          ...bars[bars.length - 1],
         });
       }
       console.log(`[getBars]: returned ${bars.length} bar(s)`);
       onHistoryCallback(bars, {
-        noData: false
+        noData: false,
       });
     } catch (error) {
       console.log("[getBars]: Get error", error);
@@ -536,7 +695,10 @@ export default {
     subscribeUID,
     onResetCacheNeededCallback
   ) => {
-    console.log("[subscribeBars]: Method call with subscribeUID:", subscribeUID);
+    console.log(
+      "[subscribeBars]: Method call with subscribeUID:",
+      subscribeUID
+    );
     subscribeOnStream(
       symbolInfo,
       resolution,
