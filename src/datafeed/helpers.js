@@ -23,8 +23,10 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
             query: `
                     {   
                         ethereum(network: bsc) {
-                        dexTrades(options: {limit: 15000, asc: "timeInterval.${typeInterval}"}, 
+                        dexTrades(options: {asc: "timeInterval.${typeInterval}"}, 
                         date: {since:"${sinceDate}", till:"${tillDate}"}
+                        priceAsymmetry: {lt: 10}
+                        tradeAmountUsd: {gteq: 1}
                         exchangeName: {in: ["Pancake", "Pancake v2"]}, 
                         baseCurrency: {is: "${token0Id}"}, 
                         quoteCurrency: {is: "${token1Id}"}) {
@@ -33,10 +35,11 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
                             ${resolution}
                         }
 
+                        volume: quoteAmount
                         maximum_price: quotePrice(calculate: maximum)
                         minimum_price: quotePrice(calculate: minimum)
-                        open_price: minimum(of: block get: quote_price)
-                        close_price: maximum(of: block get: quote_price)
+                        open_price: minimum(of: block, get: quote_price)
+                        close_price: maximum(of: block, get: quote_price)
                     }   
                 }
             }
