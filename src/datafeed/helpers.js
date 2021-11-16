@@ -26,7 +26,7 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
                         dexTrades(options: {asc: "timeInterval.${typeInterval}"}, 
                         date: {since:"${sinceDate}", till:"${tillDate}"}
                         priceAsymmetry: {lt: 10}
-                        tradeAmountUsd: {gteq: 1}
+                        tradeAmountUsd: {gt: 10}
                         exchangeName: {in: ["Pancake", "Pancake v2"]}, 
                         baseCurrency: {is: "${token0Id}"}, 
                         quoteCurrency: {is: "${token1Id}"}) {
