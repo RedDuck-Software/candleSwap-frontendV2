@@ -584,7 +584,7 @@ export default {
           return;
         }
         let bars = currentPair.map((bar) => ({
-          time: new Date(bar.timeInterval[urlParameters.intervalType]).getTime(),
+          time: new Date(`${bar.timeInterval[urlParameters.intervalType]} GMT+00:00`).getTime(),
           low: bar["minimum_price"],
           high: bar["maximum_price"],
           open: bar["open_price"],
@@ -653,7 +653,7 @@ export default {
         return;
       }
       let bars = data.map((bar) => ({
-        time: new Date(bar.timeInterval[urlParameters.intervalType]).getTime(),
+        time: new Date(`${bar.timeInterval[urlParameters.intervalType]} GMT+00:00`).getTime(),
         low: bar["minimum_price"],
         high: bar["maximum_price"],
         open: bar["open_price"],
