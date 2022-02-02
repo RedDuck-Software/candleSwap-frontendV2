@@ -1,4 +1,3 @@
-// Make requests to  Bitquery API
 import * as axios from 'axios'
 
 // Index of ApiKeys
@@ -23,18 +22,16 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
             query: `
                     {   
                         ethereum(network: bsc) {
-                        dexTrades(options: {asc: "timeInterval.${typeInterval}"}, 
+                        dexTrades(options: {limit: 2000, asc: "timeInterval.${typeInterval}"}, 
                         date: {since:"${sinceDate}", till:"${tillDate}"}
                         priceAsymmetry: {lt: 10}
                         tradeAmountUsd: {gt: 10}
                         exchangeName: {in: ["Pancake", "Pancake v2"]}, 
                         baseCurrency: {is: "${token0Id}"}, 
                         quoteCurrency: {is: "${token1Id}"}) {
-
                         timeInterval {
                             ${resolution}
                         }
-
                         volume: quoteAmount
                         maximum_price: quotePrice(calculate: maximum)
                         minimum_price: quotePrice(calculate: minimum)

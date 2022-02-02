@@ -516,7 +516,6 @@ export default {
   ) {
     const bnbUsdtPair = "WBNB/USDT";
     const { from, to, firstDataRequest } = periodParams;
-    console.log(from, to,firstDataRequest )
     const symbols = await getAllSymbols();
     const symbolItem = symbols.find(({ symbol }) => symbol === bnbUsdtPair);
     const [symbol1, symbol2] = symbolItem.symbol.split("/");
@@ -526,7 +525,7 @@ export default {
       token0Id: token1Usdt.address,
       token1Id: token2Usdt.address,
       periodSeconds: resolutionToSeconds(resolution),
-      startTime: `${new Date(from * 992).toISOString()}`,
+      startTime: `${new Date(from * 1000).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
       intervalType: resolutionToSeconds(resolution).split("(")[0],
     };
@@ -534,7 +533,7 @@ export default {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
       periodSeconds: resolutionToSeconds(resolution),
-      startTime: `${new Date(from * 992).toISOString()}`,
+      startTime: `${new Date(from * 1000).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
       intervalType: resolutionToSeconds(resolution).split("(")[0],
     };
