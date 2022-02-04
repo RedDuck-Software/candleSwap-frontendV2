@@ -316,6 +316,7 @@ export const getTokenSymbol = (address) => {
     "https://bsc-dataseed.binance.org/"
   );
   const TokenContract = new ethers.Contract(address, ERC20_ABI, provider);
+  console.log(TokenContract)
   return TokenContract.symbol();
 };
 
@@ -631,7 +632,7 @@ export default {
       token0Id: symbolInfo.token0Id,
       token1Id: symbolInfo.token1Id,
       periodSeconds: resolutionToSeconds(resolution),
-      startTime: `${new Date(from * 992).toISOString()}`,
+      startTime: `${new Date(from * 1000).toISOString()}`,
       endTime: `${new Date(to * 1000).toISOString()}`,
       intervalType: resolutionToSeconds(resolution).split("(")[0],
     };

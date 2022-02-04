@@ -20,26 +20,39 @@ export async function makeApiRequest(token0Id, token1Id, sinceDate, tillDate, re
         },
         data: {
             query: `
-                    {   
-                        ethereum(network: bsc) {
-                        dexTrades(options: {limit: 2000, asc: "timeInterval.${typeInterval}"}, 
-                        date: {since:"${sinceDate}", till:"${tillDate}"}
-                        priceAsymmetry: {lt: 10}
-                        tradeAmountUsd: {gt: 10}
-                        exchangeName: {in: ["Pancake", "Pancake v2"]}, 
-                        baseCurrency: {is: "${token0Id}"}, 
-                        quoteCurrency: {is: "${token1Id}"}) {
-                        timeInterval {
-                            ${resolution}
-                        }
-                        volume: quoteAmount
-                        maximum_price: quotePrice(calculate: maximum)
-                        minimum_price: quotePrice(calculate: minimum)
-                        open_price: minimum(of: block, get: quote_price)
-                        close_price: maximum(of: block, get: quote_price)
-                    }   
-                }
-            }
+                    {
+  ethereum(network: bsc) {
+    dexTrades(
+      options: {limit: 2000, asc: "timeInterval.${typeInterval}"}
+      date: {since: "${sinceDate}"}
+      priceAsymmetry: {lt: 10}
+        tradeAmountUsd: {gt: 10}
+      exchangeName: {in: ["Pancake", "Pancake v2"]}
+      baseCurrency: {is: "${token0Id}"}
+      quoteCurrency: {is: "${token1Id}"}
+    ) {
+      timeInterval {
+        ${resolution}
+      }
+      baseCurrency {
+        symbol
+        address
+      }
+      baseAmount
+      quoteCurrency {
+        symbol
+        address
+      }
+      quoteAmount
+      trades: count
+      quotePrice
+      maximum_price: quotePrice(calculate: maximum)
+      minimum_price: quotePrice(calculate: minimum)
+      open_price: minimum(of: block, get: quote_price)
+      close_price: maximum(of: block, get: quote_price)
+    }
+  }
+}
             `,
         }   
     }).then((result) => {
@@ -10285,12 +10298,6 @@ export const whitePairsList = [
         token1Symbol: "USDT",
         token0Address: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
         token1Address: "0x55d398326f99059fF775485246999027B3197955"
-    },
-    {
-        token0Symbol: "XRP",
-        token1Symbol: "BUSD",
-        token0Address: "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
-        token1Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"
     },
     {
         token0Symbol: "HARD",
